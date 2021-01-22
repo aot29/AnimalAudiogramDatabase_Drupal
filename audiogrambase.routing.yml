@@ -1,0 +1,21 @@
+audiogrambase.content:
+  path: '/audiogrambase'
+  defaults:
+    _controller: '\Drupal\audiogrambase\Controller\AudiogrambaseController::browse'
+  requirements:
+    _permission: 'access content'
+
+audiogrambase.details:
+  path: '/audiogram'
+  defaults:
+    _controller: '\Drupal\audiogrambase\Controller\AudiogrambaseController::details'
+  requirements:
+    _permission: 'access content'
+
+audiogrambase.advanced:
+  path: '/advanced'
+  defaults:
+    _controller: '\Drupal\audiogrambase\Controller\AudiogrambaseController::advanced'
+  requirements:
+    _permission: 'access content'
+

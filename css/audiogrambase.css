@@ -1,0 +1,148 @@
+
+#display, #details {
+    float: left;
+    width: 50%;
+}
+#details_frame {
+    overflow: auto;
+    height: 350px;
+}
+#details_footer {
+    text-align: right;
+    margin-top: 2em;
+}
+.row {
+    background-color:white;
+    padding: 1em;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+.row:after {
+    content: "";
+    display: table;
+    clear: both;    
+}
+
+#details {
+    margin-top: 1em;
+}
+
+#caption {
+    margin-bottom: 1em;
+}
+
+#caption .binomial_name {
+    font-size: larger;
+    font-weight: bold;
+}
+
+#display_animal_details table.metadata:first-child {
+    border-bottom: 1px solid #ddd;
+    border-collapse: unset;
+}
+
+#display_animal_details table.metadata:last-child {
+    border-bottom: none;
+}
+
+#display_button, #reset_button {
+    margin-right: .25em;
+    margin-left: .25em;
+}
+
+.button {
+    background-color: #f3f3f3;
+}
+.main_button {
+    color: #fff;
+    background-color: #7da30b;
+    border-right-color: #7da30b;
+    border-bottom-color: #7da30b;
+    border-left-color: #7da30b;
+    background-image: none;
+}
+.main_button:hover {
+    color: #fff;    
+    background-color: #91bd0d;    
+}
+
+#hip_footer {
+}
+
+details {
+    border: none;
+}
+
+summary {
+    text-shadow: none;
+    background: none;
+}
+
+summary h3 {
+    border-bottom: 1px solid black;
+    display: inline-block;
+    width: 90%;
+}
+
+table.metadata {
+    width: 90%;
+}
+
+table.metadata th {
+    text-align: right;
+    vertical-align: top;
+    font-weight: bold;
+    background-color:white;
+    color:black;
+    border-bottom-style: solid;
+}
+th.key {
+    min-width: 25%;
+}
+th.key:first-letter {
+    text-transform: capitalize;
+}
+table.metadata td {
+    background-color:white;
+    vertical-align: top;
+}
+
+table.metadata td:first-letter, table.browse td:first-letter {
+    text-transform: capitalize;
+}
+
+
+.binomial_name:first-letter {
+    text-transform: capitalize;
+}
+
+img.audiogram_preview {
+    max-height: 480px;
+}
+
+.table_nav {
+    float: right;
+    display: table;
+}
+
+.species_name {
+    font-style: italic;
+}
+
+.audiogram {
+    margin-bottom: 2em;
+}
+
+.stablelink {
+    display: none;
+}
+
+#converted {
+    margin-left: 3em;
+    margin-right: 5em;
+    font-style: italic;    
+}
+.audiogram_id {
+    font-style: italic;
+}

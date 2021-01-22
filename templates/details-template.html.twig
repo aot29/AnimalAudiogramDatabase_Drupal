@@ -1,0 +1,373 @@
+<link rel="stylesheet" type="text/css" href="/modules/custom/audiogrambase/css/audiogrambase.css"/>
+
+<script src="/modules/custom/audiogrambase/libs/nanobar.min.js"></script>
+<script src="/modules/custom/audiogrambase/libs/jquery.min.js"></script>
+<script src="/modules/custom/audiogrambase/js/utils.js"></script>
+<script src="/modules/custom/audiogrambase/js/API_Client.js"></script>
+<script src="/modules/custom/audiogrambase/js/Formatter.js"></script>
+<script src="/modules/custom/audiogrambase/js/Controls.js"></script>
+<script language="javascript">
+  var API_URL = "{{API_URL}}";
+  var api = new API_Client(API_URL);
+
+  /**The controls class for this page*/
+  var controls = new Controls(api);
+
+  window.addEventListener("load", function(event) {
+      try {
+          var ids = API_Client.decode();
+          if (!ids) throw new Exception("No audiogram id given.")
+          var displays_layers = location.search.includes("layers=true");
+          /* Displaying layers */
+          if (displays_layers == true) {
+              display_layers(ids);
+          }
+          /* Displaying details */
+          else {
+              display_details(ids);
+          }
+          controls.render();
+          parse_binomial_names();
+          
+      } catch(err) {
+  	  console.log(err);
+      }
+  });
+
+  /** Italicize binomial names */
+  function parse_binomial_names() {
+      // get a list of all species and subspecies in the database
+      var all_taxa = api.list_species();
+      // split into subspecies and species
+      var species = [];
+      var subspecies = [];
+      for (i in all_taxa) {
+          var sp = all_taxa[i].taxon_name;
+          if (sp.split(' ').length == 3) {
+              subspecies.push(sp);
+          } else {
+              species.push(sp);
+          }
+      }
+      // get the long citations and italicize species names
+      var tds = document.querySelectorAll("#display_publication_details .metadata td");      
+      for (i in tds) {
+          var content = tds[i].innerHTML;
+              if (tds[i].innerHTML) {
+                  // first do subspecies
+                  for(j in subspecies) {
+                      var sp_name = subspecies[j];
+                      tds[i].innerHTML = tds[i].innerHTML.replace(sp_name, `<i>${sp_name}</i>`);
+                  }
+                  // then do species
+                  for(j in species) {
+                      var sp_name = species[j];
+                      tds[i].innerHTML = tds[i].innerHTML.replace(sp_name, `<i>${sp_name}</i>`);
+                  }
+          }
+      }
+  }
+  
+  var test;
+  /** Display requested audiograms in one diagram  */
+  function display_layers(ids) {
+      var results = api.list(ids);
+      var formatter = new Layers_Table_Formatter();
+      var outputHTML = formatter.render(results).outerHTML;
+      var audiogramHTML = `
+         <div class="audiogram row">
+             <!--Audiogram column-->
+             <div id="display" class="column">
+                 <div id="progress_layers"></div>
+             </div>
+             <!--Details column-->
+             <div id="details" class="column">
+                 ${outputHTML}
+             </div>
+         </div>
+     `;
+      document.getElementById("audiograms").innerHTML += audiogramHTML;
+      renderAudiogramsAsLayers(ids);
+  }
+  
+  /**
+   Launches rendering of all audiogram as layers on backend, asynchronous.
+   # Creates progress bar and message elements
+   # Launches backend render job
+   # Launches progress feedback in the frontend
+  */
+  function renderAudiogramsAsLayers(ids) {
+      var status_div = create_progress_el(`#progress_layers`);
+      var img_div = document.getElementById(`progress_layers`);
+      // send ajax GET request to start background job
+      $.ajax({
+          type: 'GET',
+          url: API_URL + 'plotlayers?ids=' + ids,
+          success: function(data, status, request) {
+              // console.log(JSON.parse(request.responseText).Location);
+              status_url = "{{BASE_URL}}" + JSON.parse(request.responseText).Location;
+              update_progress(status_url, status_div, img_div);
+          },
+          error: function() {
+              console.log(`Script error getting ` + API_URL + 'plot?id=' + ids);
+          }
+      });
+  }
+  
+  function display_details(ids) {
+      // ids given, display data for requested audiogram(s)
+      for (var i in ids) {
+          var id = ids[i];
+          var captionEl = displayCaption(id).outerHTML;
+          var publicationEls = displayPublication(id);
+          var publicationEl = ""
+          for (var p in publicationEls) {
+              publicationEl += publicationEls[p].outerHTML;
+          }
+          var animalEls = displayAnimal(id);
+          var animalEl = ""
+          for (var a in animalEls) {
+              animalEl += animalEls[a].outerHTML;
+          }
+          var experimentEl = displayExperiment(id).outerHTML;
+          var audiogramHTML = `
+             <div class="audiogram row">
+                 <!--Audiogram column-->
+                 <div id="display" class="column">
+                     <div id="progress_${id}"></div>
+                     <div id="converted_${id}"></div>
+                 </div>
+                 <!--Details column-->
+                 <div id="details" class="column">
+                     <!--Audiogram title-->
+                     <div id="caption">${captionEl}</div>
+                     <div id="details_frame">
+                         <!--Animal-->
+                         <details>
+                             <summary><h3>Animal details</h3></summary>
+                             <div id="display_animal_details">${animalEl}</div>
+                         </details>
+                         <!--Experiment-->
+                         <details>
+                             <summary><h3>Experiment details</h3></summary>
+                             <div id="display_experiment_details">${experimentEl}</div>
+                         </details>
+                         <!--Publication-->
+                         <details open="true">
+                             <summary><h3>Publication details</h3></summary>
+                             <div id="display_publication_details">${publicationEl}</div>
+                         </details>
+                     </div>
+                     <div id="details_footer">
+                         <div class="download_button button" id="download_${id}">Download original data</div>
+                     </div>
+                 </div>
+             </div>
+         `
+          document.getElementById("audiograms").innerHTML += audiogramHTML;
+      }
+      for (var i in ids) {
+          var id = ids[i];
+          renderAudiogram(id);
+      }
+      for (var i in ids) {
+          var id = ids[i];
+          var isConvertedMsg = isConverted(id);
+          addIsConvertedMsg(id, isConvertedMsg);
+      }
+      addDownloadButtons();
+      addStableButtons();
+  }
+
+  function copyLink(id) {
+      var link = document.getElementById(`stablelink_${id}`);
+      link.select();
+      link.setSelectionRange(0, 99999);
+      document.execCommand("copy");
+      alert("Copied link to clipboard: " + link.value);
+  }
+  
+  function addDownloadButtons() {
+      var buttons = document.getElementsByClassName("download_button");
+      for (var i in buttons) {
+          var button = buttons[i];
+          if (button.id) {
+              var id = button.id.split("download_")[1]
+              // console.log(id);
+              button.addEventListener("click", function(){
+                  var experiment_id = this.id.split('download_')[1];
+                  window.open(`${API_URL}download?id=${experiment_id}`, '_blank');
+              });
+          }
+      }
+  }
+
+  function addStableButtons() {
+      var buttons = document.getElementsByClassName("stable_button");
+      if (buttons.length == 1) {
+          buttons[0].style.display = 'none';
+          return;
+      }
+      for (var i in buttons) {
+          var button = buttons[i];
+          if (button.id) {
+              var id = button.id.split("stable_")[1]
+              // console.log(id);
+              button.addEventListener("click", function(){
+                  var experiment_id = this.id.split('stable_')[1];
+                  window.open(`/audiogram?ids=${experiment_id}`, '_blank');
+              });
+          }
+      }
+  }
+
+  /**
+   Display a message whether the SPL units have been converted
+  */
+  function isConverted(id) {
+      var msg = null;
+      var isConverted = api.is_converted(id);
+      if (isConverted){
+          var unitMsg = `dB re ${isConverted.spl_reference_value} ${isConverted.spl_reference_unit} (${isConverted.spl_reference_significance})`;
+          return(`Audiogram data has been converted from ${unitMsg} to current units.`)
+      }
+      return msg;
+  }
+
+  
+  function addIsConvertedMsg(id, isConvertedMsg) {
+      if (isConvertedMsg != null) {
+          var el = document.getElementById(`converted_${id}`);
+          el.innerHTML = isConvertedMsg;
+      }
+  }
+  
+  /**
+   Displays caption of an audiograms identified by URL parameter "ids".
+   # Connects to the audiogram API.
+   # Obtains the caption for an audiogram.
+   # Displays caption for the audiogram.
+  */
+  function displayCaption(id) {
+      var caption = api.get_caption(id);
+      var formatter = new Caption_Formatter()
+      var output_el = formatter.render(id, caption);
+      return output_el;
+  }
+
+  /**
+   Displays details of an audiograms identified by URL parameter "ids".
+   # Connects to the audiogram API.
+   # Obtains the details of an audiogram.
+   # Displays details on the page as a table.
+  */
+  function displayPublication(id) {
+      // display data for publication(s)
+      var formatter = new Publication_Metadata_Formatter()
+      var publication_details = api.get_publication(id);
+      var output_els = [];
+      for (var i in publication_details) {
+          output_els.push(formatter.render(publication_details[i]));
+      }
+      return output_els;
+  }
+  
+  function displayAnimal(id) {
+      // display data for each animal(s)
+      var formatter = new Animal_Metadata_Formatter()
+      var animal_details = api.get_animal(id);
+      var output_els = [];
+      for (var i in animal_details) {
+          output_els.push( formatter.render(animal_details[i]));
+      }
+      return output_els;
+  }
+
+  function displayExperiment(id) {
+      // display data for experiment
+      var formatter = new Experiment_Metadata_Formatter()
+      var experiment_details = api.get_experiment(id);
+      if (experiment_details != null) {
+          var output_el = formatter.render(experiment_details);
+      } else {
+          var output_el = formatter.create_empty_results("See publication for details");
+      }
+      return output_el;
+  }
+</script>
+<script language="javaScript">
+  var API_URL = "{{API_URL}}";
+
+  /**
+   Launches rendering of audiogram on backend, asynchronous.
+   # Creates progress bar and message elements
+   # Launches backend render job
+   # Launches progress feedback in the frontend
+  */
+  function renderAudiogram(id) {
+      var status_div = create_progress_el(`#progress_${id}`);
+      var img_div = document.getElementById(`progress_${id}`);
+      // send ajax GET request to start background job
+      $.ajax({
+          type: 'GET',
+          url: API_URL + 'plot?id=' + id,
+          success: function(data, status, request) {
+              // console.log(JSON.parse(request.responseText).Location);
+              status_url = "{{BASE_URL}}" + JSON.parse(request.responseText).Location;
+              update_progress(status_url, status_div, img_div);
+          },
+          error: function() {
+              console.log(`Script error getting ` + API_URL + 'plot?id=' + id);
+          }
+      });
+  }
+  
+  /**
+   Creates progress bar and message elements
+  */
+  function create_progress_el(base_el_id) {
+      var div = $('<div class="progress"><div></div><div></div><div>...</div><div>&nbsp;</div></div><hr>');
+      $(base_el_id).append(div);
+      return div[0];
+  }
+
+  /**
+   Reads the status URL obtained from backend after launching audiogram rendering thread.
+  */
+  function update_progress(status_url, status_div, img_div) {
+      // send GET request to status URL
+      $.getJSON(status_url, function(data) {
+          var percent = parseInt(data['current'] * 100 / data['total']);
+          // $(status_div.childNodes[1]).text(percent + '%');
+          $(status_div.childNodes[2]).text(data['status']);
+          if (['PENDING', 'PROGRESS'].indexOf(data['state']) == -1 ) {
+              if ('result' in data) {
+                  show_plot(data['result'], img_div);
+              } else {
+                  // something unexpected happened
+                  $(status_div.childNodes[3]).text('Result: ' + data['state']);
+              }
+          } else {
+              // rerun in 2 seconds
+              setTimeout(function() {
+                  update_progress(status_url, status_div, img_div);
+              }, 2000);
+          }
+      });
+  }
+
+  /**
+   Displays the rendered audiogram when backend is ready.
+  */
+  function show_plot(img_src, img_div) {
+      var img = "<img src='{0}{1}' class='audiogram_preview'/>".format("{{BASE_URL}}", img_src);
+      img_div.innerHTML = img;
+  }
+</script>  
+<div id="audiograms">
+</div>
+
+<div id="hip_footer">
+  <div id="messages"></div>
+  <a href="/audiogrambase">Back to browse</a>
+</div>

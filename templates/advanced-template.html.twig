@@ -1,0 +1,88 @@
+<link rel="stylesheet" type="text/css" href="/modules/custom/audiogrambase/css/audiogrambase.css"/>
+<link rel="stylesheet" type="text/css" href="/modules/custom/audiogrambase/css/browse.css"/>
+<script src="/modules/custom/audiogrambase/libs/jquery.min.js"></script>
+<script src="/modules/custom/audiogrambase/libs/jquery-ui.min.js"></script>
+<script src="/modules/custom/audiogrambase/js/utils.js"></script>
+<script src="/modules/custom/audiogrambase/js/API_Client.js"></script>
+<script src="/modules/custom/audiogrambase/js/Formatter.js"></script>
+<script src="/modules/custom/audiogrambase/js/AdvancedFilter.js"></script>
+<script src="/modules/custom/audiogrambase/js/specificFilters.js"></script>
+<script src="/modules/custom/audiogrambase/js/events.js"></script>
+
+<script language="javascript">
+ /** The table Formatter object for this page */
+ var formatter = new Advanced_Table_Formatter()
+
+ /** The API cient for this page*/
+ var api = new API_Client("{{API_URL}}");
+
+ /**The filter class for this page*/
+ var filter = new AdvancedFilter(api);
+ 
+ /**
+    Displays a table of all audiograms.
+    # Connects to the audiogram API.
+    # Obtains the list of audiograms.
+    # Displays it on the page as a table.
+  */
+ window.addEventListener("load", function(event) {
+     try {
+         filter.render();
+         // no query
+         if (document.location.search == "") {
+             hideButtons();
+             
+         } else {
+             // var ids = API_Client.decode();
+             var results = api.browse();
+             var output_el = formatter.render(results);
+             // no results
+             if (formatter.numberOfPages == 0) {
+                 document.getElementById("browse_result").innerHTML = "No results matching your filter criteria";
+                 hideButtons();
+                 
+             } else {
+                 // show browse section
+                 document.getElementById("browse_result").appendChild(output_el);
+                 checkButtons();
+                 updatePaginationInfo();
+                 updateSortingMark()
+                 updateTableHeaderLinks();
+                 // always enable select all button
+                 button = document.getElementById("all_button");
+                 button.removeAttribute('disabled');
+                 button.classList.remove('disabled');
+             }
+         }
+     }
+     catch(err) {
+         console.log(err);
+         document.getElementById("messages").innerHTML += "Script error";
+     }
+ });
+
+ /** Link the table headers */
+ function updateTableHeaderLinks() {
+     var tha = document.querySelectorAll('#browse_result .browse th a');
+     var search = filter._requestedParametersToURL();
+     for (var i in tha) {
+         var url = `${tha[i].href}${search}`;
+         tha[i].href = url;
+     }
+ }
+
+</script>
+
+<div id="browse">
+    <div id="browse_result"></div>
+    <div class="table_nav">
+        <ul class="pager">
+            <li class="previous"><input type="button" id="previous_button" value="Previous" class="button"/></li>
+            <li><div id="pagination_info"/></li>
+            <li class="next"><input type="button" id="next_button" value="Next" class="button"/></li>
+        </ul>
+    </div>
+    <div class="button main_button" id="display_button">Display selected</div>
+    <div class="button disabled" id="all_button" disabled="true">Display all</div>
+</div>
+<div id="messages"></div>

@@ -1,0 +1,21 @@
+<?php
+function audiogrambase_twig_theme($existing, $type, $theme, $path) {
+  return [
+    'browse_template' => [
+    ],
+    'filter_template' => [
+                      'variables' => [],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_theme().
+ */
+function block_filter($existing, $type, $theme, $path) {
+  return [
+    'filter_template' => [
+                      'variables' => [],
+    ],
+  ];
+}
