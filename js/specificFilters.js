@@ -17,7 +17,8 @@ class MeasurementTypeFilter extends AdvancedFilter {
     }
     
     render() {
-        var types = ['auditory threshold', 'critical ratio', 'critical bandwidth', 'time period of integration', 'TTS - Temporary Threshold Shift', 'PTS - Permanent Threshold Shift', 'signal duration test'];
+        // var types = ['auditory threshold', 'critical ratio', 'critical bandwidth', 'time period of integration', 'TTS - Temporary Threshold Shift', 'PTS - Permanent Threshold Shift', 'signal duration test'];
+        var types = ['auditory threshold', 'critical ratio', 'TTS - Temporary Threshold Shift', 'signal duration test'];
         var selectedOptions = this._getSelectedOption('measurement_type');
         var options = "";
         for (var t in types) {
