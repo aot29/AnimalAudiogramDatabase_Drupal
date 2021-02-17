@@ -64,6 +64,7 @@ class Filter {
         var selectedOption = this._getSelectedOption('species');
         var options = "<option></option>";
         for (var t in taxa) {
+            if (t.total == 0) continue; // skip taxa with no entries
             var selected = (selectedOption == taxa[t].ott_id)? "selected" : ""; 
             if (taxa[t].total != 0) { // taxa[t].total is the number of animals, not the numebr of experiments/audiograms
                 options += `<option value="${taxa[t].ott_id}" ${selected}>${taxa[t].vernacular_name_english}</option>`;

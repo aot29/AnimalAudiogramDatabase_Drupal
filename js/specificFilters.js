@@ -64,6 +64,7 @@ class VernacularNameFilter extends AdvancedFilter {
         // console.log(selectedOptions);
         var options = "<option></option>";
         for (var t in taxa) {
+            if (t.total == 0) continue; // skip taxa with no entries
             for (var o in selectedOptions) {
                 var selected = "";
                 if (selectedOptions[o] == taxa[t].ott_id) {
