@@ -50,6 +50,7 @@ class Controls {
     /** Display requested audiograms as one diagram each */
     details() {
         var ids = location.search.split('?layers=true&')[1];
+        ids = decodeURIComponent(ids); // patch for issue #35
         var url = `${location.pathname}?${ids}`;
         window.location.href = url;
     }
