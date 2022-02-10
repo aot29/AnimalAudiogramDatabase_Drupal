@@ -371,7 +371,7 @@ class Experiment_Metadata_Formatter extends Metadata_Table_Formatter {
 	    'background_noise_in_decibel': "Background noise",
 	    'calibration': "Calibration",
 	    'threshold_determination_method': "Threshold determination info",
-	    'testtone_form_method': "Form of the tone",
+	    'testtone_form_method': "Test Tone Form",
 	    'testtone_presentation_staircase': "Staircase procedure",
 	    'testtone_presentation_method_constants': "Method of Constants",
 	    'testtone_presentation_sound_form': "Form of the sound",
