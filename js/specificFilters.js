@@ -629,7 +629,7 @@ class FormFilter extends OptionsFilter {
     constructor(api) {
         var name = 'form';
         var label = 'Test Tone Presentation';
-        var options = ['click','pipe trains','prolonged','SAM (sinusoidal amplitude modulation)'];
+        var options = ['click','pip trains','prolonged'];
         super(api, name, label, options);
     }
 }
