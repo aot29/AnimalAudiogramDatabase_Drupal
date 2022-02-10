@@ -43,7 +43,7 @@ class Filter {
         $('#species_filter').css('font-style', 'italic');
     }
 
-    /** HTML for "By measurement type" pulldown */
+    /** HTML for "By measurement objective" pulldown */
     _renderFilterByMeasurementType() {
         var types = ['auditory threshold', 'critical ratio', 'critical bandwidth', 'equal loudness contours', 'time period of integration', 'TTS - Temporary Threshold Shift', 'PTS - Permanent Threshold Shift', 'signal duration test'];
         var selectedOption = this._getSelectedOption('measurement_type');
@@ -53,7 +53,7 @@ class Filter {
             var display_name = this._encodStr(replace_special_chars(types[t]));
             options += `<option value="${types[t]}" ${selected}>${display_name}</option>`;
         }
-        var markup = `<label for="measurement_type_filter">By measurement type</label><select id="measurement_type_filter">${options}</select>`
+        var markup = `<label for="measurement_type_filter">By measurement objective</label><select id="measurement_type_filter">${options}</select>`
         return markup;
     }
     
@@ -73,7 +73,7 @@ class Filter {
         return markup;
     }
     
-    /** HTML for "By measurement method" pulldown */
+    /** HTML for "By general methodology" pulldown */
     _renderFilterByMeasurementMethod() {
         var methods = this.api.list_parent_measurement_methods(); 
         var selectedOption = this._getSelectedOption('method');
@@ -82,7 +82,7 @@ class Filter {
             var selected = (selectedOption == methods[m].method_id)? "selected" : ""; 
             options += `<option value="${methods[m].method_id}" ${selected}>${methods[m].method_name}</option>`;
         }
-        var markup = `<label for="method_filter">By measurement method</label><select id="method_filter">${options}</select>`
+        var markup = `<label for="method_filter">By general methodology</label><select id="method_filter">${options}</select>`
         return markup;
     }
     
@@ -119,14 +119,14 @@ class Filter {
      * * reload the page
      */
     apply() {
-        // read value for "By measurement type"
+        // read value for "By measurement objective"
         var measurementTypeEl = document.getElementById("measurement_type_filter");
         var selectedMeasurementType = measurementTypeEl.options[measurementTypeEl.selectedIndex].value
         
         // read value for "By species"
         var selectedSpecies = this._readSelectedSpecies().join(",");
         
-        // read value for "By measurement method"
+        // read value for "By general methodology"
         var methodFilterEl = document.getElementById("method_filter");
         if (methodFilterEl.selectedIndex != -1) {
             var selectedMethod = methodFilterEl.options[methodFilterEl.selectedIndex].value
