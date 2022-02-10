@@ -374,7 +374,7 @@ class Experiment_Metadata_Formatter extends Metadata_Table_Formatter {
 	    'testtone_form_method': "Test Tone Form",
 	    'testtone_presentation_staircase': "Staircase procedure",
 	    'testtone_presentation_method_constants': "Method of Constants",
-	    'testtone_presentation_sound_form': "Form of the sound",
+	    'testtone_presentation_sound_form': "Test Tone Presentation",
 	    'sedated': "Sedated",
 	    'sedation_details': "Sedation details"
 	}

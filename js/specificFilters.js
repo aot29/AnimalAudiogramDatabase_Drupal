@@ -628,7 +628,7 @@ class StaircaseFilter extends BooleanFilter {
 class FormFilter extends OptionsFilter {
     constructor(api) {
         var name = 'form';
-        var label = 'Form of the sound';
+        var label = 'Test Tone Presentation';
         var options = ['click','pipe trains','prolonged','SAM (sinusoidal amplitude modulation)'];
         super(api, name, label, options);
     }
