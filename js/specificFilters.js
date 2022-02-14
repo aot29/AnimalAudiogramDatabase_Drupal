@@ -591,7 +591,7 @@ class ToneFilter extends AdvancedFilter {
             options += `<input ${checked} style="margin-left: 1em;" type="checkbox" class="toneCheckbox" value="${m.method_id}" id="tone_${m.method_id}"><label class="filter_value" for="tone_${m.method_id}2">${m.method_name}</label><br/>`
         }
         var markup = `
-            <label class="filter_label" for="method_filter">Form of the tone</label>
+            <label class="filter_label" for="method_filter">Test Tone Form</label>
             ${options}
         `;
         return markup;
@@ -628,7 +628,7 @@ class StaircaseFilter extends BooleanFilter {
 class FormFilter extends OptionsFilter {
     constructor(api) {
         var name = 'form';
-        var label = 'Form of the sound';
+        var label = 'Test tone presentation';
         var options = ['click','pipe trains','prolonged','SAM (sinusoidal amplitude modulation)'];
         super(api, name, label, options);
     }
